@@ -5,6 +5,7 @@ import os.path
 import itertools
 
 from .history import History
+from .genetics import Genetics
 from .skills import CatSkills
 from ..housekeeping.datadir import get_save_dir
 from ..events_module.generate_events import GenerateEvents
@@ -199,6 +200,8 @@ class Cat():
         self.skills = CatSkills(skill_dict=skill_dict)
         self.personality = Personality(trait="troublesome", lawful=0, aggress=0,
                                        stable=0, social=0)
+        self.genotype = []
+
         self.parent1 = parent1
         self.parent2 = parent2
         self.adoptive_parents = []
@@ -323,6 +326,13 @@ class Cat():
                 self.pronouns = [self.default_pronouns[1].copy()]
             elif self.genderalign in ["male", "trans male"]:
                 self.pronouns = [self.default_pronouns[2].copy()]"""
+
+            #GENETICS 
+            # placeholder, so genotype isn't empty - put function call here later like in self.pelt
+            self.genotype.append(choice(["Apb", "A", "a"]))
+            self.genotype.append(choice(["Apb", "A", "a"]))
+            self.genotype.append(choice(["B", "b", "b1"]))
+            self.genotype.append(choice(["B", "b", "b1"]))
 
             # APPEARANCE
             self.pelt = Pelt.generate_new_pelt(self.gender, [Cat.fetch_cat(i) for i in (self.parent1, self.parent2) if i], self.age)
@@ -1529,7 +1539,60 @@ class Cat():
         if cousin_allowed:
             return self.inheritance.all_involved
         return self.inheritance.all_but_cousins
+    # ---------------------------------------------------------------------------- #
+    #                                  genetics                                    #
+    # ---------------------------------------------------------------------------- # 
 
+    def save_genetics(self):
+        clanname = None
+        if game.switches['clan_name'] != '':
+            clanname = game.switches['clan_name']
+        elif len(game.switches['clan_name']) > 0:
+            clanname = game.switches['clan_list'][0]
+        elif game.clan is not None:
+            clanname = game.clan.name
+
+        genetics_directory = get_save_dir() + '/' + clanname + '/genetics'
+        genetics_file_path = genetics_directory + '/' + self.ID + '_genetics.json'
+
+        if self.dead:
+            if os.path.exists(genetics_file_path):
+                os.remove(genetics_file_path)
+            return
+
+        if type(self.genotype) is Genetics:
+            return
+        else:
+            genetics_dict = Genetics.make_dict(self)
+
+        try:
+            game.safe_save(genetics_file_path, genetics_dict)
+        except:
+            print(f"WARNING: saving genetic data of cat #{self.ID} didn't work")
+
+    def load_genetics(self):
+        if game.switches['clan_name'] != '':
+            clanname = game.switches['clan_name']
+        else:
+            clanname = game.switches['clan_list'][0]
+
+        genetics_directory = get_save_dir() + '/' + clanname + '/genetics/'
+        genetics_cat_directory = genetics_directory + self.ID + '_genetics.json'
+
+        if not os.path.exists(genetics_cat_directory):
+            return
+
+        try:
+            with open(genetics_cat_directory, 'r') as read_file:
+                genetic_data = ujson.loads(read_file.read())
+                self.genotype = Genetics(
+                    locus_a=genetic_data["locus_a"],
+                    locus_b=genetic_data["locus_b"]
+                )
+            print(self.genotype.locus_b)
+
+        except Exception as e:
+            print(f"WARNING: There was an error reading the genetic data file of cat #{self}.\n", e)
     # ---------------------------------------------------------------------------- #
     #                                  conditions                                  #
     # ---------------------------------------------------------------------------- #

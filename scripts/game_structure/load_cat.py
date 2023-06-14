@@ -195,6 +195,11 @@ def json_load():
     # replace cat ids with cat objects and add other needed variables
     for cat in all_cats:
 
+        if not cat.dead:
+            cat.load_genetics()
+        else:
+            cat.genotype = []
+
         cat.load_conditions()
 
         # this is here to handle paralyzed cats in old saves
