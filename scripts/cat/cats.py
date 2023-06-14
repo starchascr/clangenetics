@@ -327,12 +327,9 @@ class Cat():
             elif self.genderalign in ["male", "trans male"]:
                 self.pronouns = [self.default_pronouns[2].copy()]"""
 
-            #GENETICS 
-            # placeholder, so genotype isn't empty - put function call here later like in self.pelt
-            self.genotype.append(choice(["Apb", "A", "a"]))
-            self.genotype.append(choice(["Apb", "A", "a"]))
-            self.genotype.append(choice(["B", "b", "b1"]))
-            self.genotype.append(choice(["B", "b", "b1"]))
+            #GENETICS
+            self.genotype = Genetics.random_genes()
+            print(self.genotype)
 
             # APPEARANCE
             self.pelt = Pelt.generate_new_pelt(self.gender, [Cat.fetch_cat(i) for i in (self.parent1, self.parent2) if i], self.age)
