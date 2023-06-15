@@ -1,5 +1,6 @@
 from random import choice
 from scripts.cat.sprites import Sprites
+from .genetics import Genetics
 import random
 from re import sub
 from scripts.game_structure.game_essentials import game
@@ -191,11 +192,11 @@ class Pelt():
         self.skin = skin
 
     @staticmethod
-    def generate_new_pelt(gender:str, parents:tuple=(), age:str="adult"):
+    def generate_new_pelt(gender:str, genotype, parents:tuple=(), age:str="adult"):
         new_pelt = Pelt()
         
-        pelt_white = new_pelt.init_pattern_color(parents, gender)
-        new_pelt.init_white_patches(pelt_white, parents)
+        pelt_white = new_pelt.init_pattern_color(parents, gender, genotype)
+        new_pelt.init_white_patches(pelt_white, parents, genotype)
         new_pelt.init_sprite()
         new_pelt.init_scars(age)
         new_pelt.init_accessories(age)
@@ -522,7 +523,7 @@ class Pelt():
         self.tortiebase = chosen_tortie_base   # This will be none if the cat isn't a tortie.
         return chosen_white
 
-    def randomize_pattern_color(self, gender):
+    def randomize_pattern_color(self, gender, genotype):
         # ------------------------------------------------------------------------------------------------------------#
         #   PELT
         # ------------------------------------------------------------------------------------------------------------#
@@ -562,15 +563,20 @@ class Pelt():
         #   PELT LENGTH
         # ------------------------------------------------------------------------------------------------------------#
 
-
-        chosen_pelt_length = random.choice(Pelt.pelt_length)
+        if genotype.count("l") > 1:
+            chosen_pelt_length = "long"
+        else:
+            chosen_pelt_length = choice(["short", "medium"])
 
         # ------------------------------------------------------------------------------------------------------------#
         #   PELT WHITE
         # ------------------------------------------------------------------------------------------------------------#
 
-
-        chosen_white = random.randint(1, 100) <= 40
+        if any(element in ["W", "ws"] for element in genotype):
+            chosen_white = True
+        else:
+            chosen_white = False
+        #chosen_white = random.randint(1, 100) <= 40
 
         # Adjustments to pelt chosen based on if the pelt has white in it or not.
         if chosen_pelt in ["TwoColour", "SingleColour"]:
@@ -588,7 +594,7 @@ class Pelt():
         self.tortiebase = chosen_tortie_base   # This will be none if the cat isn't a tortie.
         return chosen_white
 
-    def init_pattern_color(self, parents, gender) -> bool:
+    def init_pattern_color(self, parents, gender, genotype) -> bool:
         """Inits self.name, self.colour, self.length, 
             self.tortiebase and determines if the cat 
             will have white patche or not. 
@@ -599,7 +605,7 @@ class Pelt():
             #If the cat has parents, use inheritance to decide pelt.
             chosen_white = self.pattern_color_inheritance(parents, gender)
         else:
-            chosen_white = self.randomize_pattern_color(gender)
+            chosen_white = self.randomize_pattern_color(gender, genotype)
         
         return chosen_white
 
@@ -826,7 +832,7 @@ class Pelt():
         if self.points and self.white_patches in [Pelt.high_white, Pelt.mostly_white, 'FULLWHITE']:
             self.points = None
 
-    def randomize_white_patches(self):
+    def randomize_white_patches(self, genotype):
 
         # Points determination. Tortie can't be pointed
         if self.name != "Tortie" and not random.getrandbits(game.config["cat_generation"]["random_point_chance"]):
@@ -836,10 +842,18 @@ class Pelt():
             self.points = None
 
         # Adjust weights for torties, since they can't have anything greater than mid_white:
-        if self.name == "Tortie":
-            weights = (2, 1, 0, 0, 0)
-        elif self.name == "Calico":
-            weights = (0, 0, 20, 15, 1)
+        #if self.name == "Tortie":
+        #    weights = (2, 1, 0, 0, 0)
+        #elif self.name == "Calico":
+        #    weights = (0, 0, 20, 15, 1)
+        #else:
+        #    weights = (10, 10, 10, 10, 1)
+        if any(element in "W" for element in genotype):
+            weights = (0, 0, 0, 0, 1)
+        elif genotype.count("ws") > 1:
+            weights = (0, 0, 15, 5, 0)
+        elif genotype.count("ws") == 1: #and genotype.count("W") == 0:
+            weights = (15, 10, 0, 0, 0)
         else:
             weights = (10, 10, 10, 10, 1)
 
@@ -852,7 +866,7 @@ class Pelt():
         if self.points and self.white_patches in [Pelt.high_white, Pelt.mostly_white, 'FULLWHITE']:
             self.points = None
 
-    def init_white_patches(self, pelt_white, parents:tuple):
+    def init_white_patches(self, pelt_white, parents:tuple, genotype):
         # Vit can roll for anyone, not just cats who rolled to have white in their pelt. 
         par_vit = []
         for p in parents:
@@ -870,7 +884,7 @@ class Pelt():
             if parents:
                 self.white_patches_inheritance(parents)
             else:
-                self.randomize_white_patches()
+                self.randomize_white_patches(genotype)
         else:
             self.white_patches = None
             self.points = None

@@ -330,9 +330,10 @@ class Cat():
             #GENETICS
             self.genotype = Genetics.random_genes()
             print(self.genotype)
+            print("--------------------------")
 
             # APPEARANCE
-            self.pelt = Pelt.generate_new_pelt(self.gender, [Cat.fetch_cat(i) for i in (self.parent1, self.parent2) if i], self.age)
+            self.pelt = Pelt.generate_new_pelt(self.gender, self.genotype, [Cat.fetch_cat(i) for i in (self.parent1, self.parent2) if i], self.age)
             
             #Personality
             self.personality = Personality(kit_trait=self.is_baby())

@@ -181,4 +181,6 @@ cache/
 download.tmp
 version.ini
 *.xml
-sprites/wip/spritesheet.sai2
+*.sai2
+*.kra
+*.kra~
