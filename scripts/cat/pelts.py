@@ -841,18 +841,11 @@ class Pelt():
         else:
             self.points = None
 
-        # Adjust weights for torties, since they can't have anything greater than mid_white:
-        #if self.name == "Tortie":
-        #    weights = (2, 1, 0, 0, 0)
-        #elif self.name == "Calico":
-        #    weights = (0, 0, 20, 15, 1)
-        #else:
-        #    weights = (10, 10, 10, 10, 1)
         if any(element in "W" for element in genotype):
             weights = (0, 0, 0, 0, 1)
         elif genotype.count("ws") > 1:
             weights = (0, 0, 15, 5, 0)
-        elif genotype.count("ws") == 1: #and genotype.count("W") == 0:
+        elif genotype.count("ws") == 1:
             weights = (15, 10, 0, 0, 0)
         else:
             weights = (10, 10, 10, 10, 1)

@@ -328,9 +328,12 @@ class Cat():
                 self.pronouns = [self.default_pronouns[2].copy()]"""
 
             #GENETICS
-            self.genotype = Genetics.random_genes()
-            print(self.genotype)
-            print("--------------------------")
+            if not self.parent1:
+                self.genotype = Genetics.random_genes()
+                print(self.genotype)
+                print("--------------------------")
+            else:
+                self.genotype = Genetics.inheritance_genes(parents=[Cat.fetch_cat(i) for i in (self.parent1, self.parent2) if i])
 
             # APPEARANCE
             self.pelt = Pelt.generate_new_pelt(self.gender, self.genotype, [Cat.fetch_cat(i) for i in (self.parent1, self.parent2) if i], self.age)
@@ -1584,10 +1587,22 @@ class Cat():
             with open(genetics_cat_directory, 'r') as read_file:
                 genetic_data = ujson.loads(read_file.read())
                 self.genotype = Genetics(
-                    locus_a=genetic_data["locus_a"],
-                    locus_b=genetic_data["locus_b"]
+                    locus_a=genetic_data[self.ID]["locus_a"],
+                    locus_b=genetic_data[self.ID]["locus_b"],
+                    locus_bm=genetic_data[self.ID]["locus_bm"],
+                    locus_c=genetic_data[self.ID]["locus_c"],
+                    locus_d=genetic_data[self.ID]["locus_d"],
+                    locus_e=genetic_data[self.ID]["locus_e"],
+                    locus_i=genetic_data[self.ID]["locus_i"],
+                    locus_l=genetic_data[self.ID]["locus_l"],
+                    locus_mc=genetic_data[self.ID]["locus_mc"],
+                    locus_o=genetic_data[self.ID]["locus_o"],
+                    locus_sp=genetic_data[self.ID]["locus_sp"],
+                    locus_ta=genetic_data[self.ID]["locus_ta"],
+                    locus_w=genetic_data[self.ID]["locus_w"],
+                    locus_wb=genetic_data[self.ID]["locus_wb"],
                 )
-            print(self.genotype.locus_b)
+            print(self.genotype.locus_a)
 
         except Exception as e:
             print(f"WARNING: There was an error reading the genetic data file of cat #{self}.\n", e)

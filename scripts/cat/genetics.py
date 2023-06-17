@@ -43,6 +43,7 @@ class Genetics:
 	@staticmethod
 	def make_dict(cat):
 		genetics_dict = {
+			cat.ID: {
 			"locus_a": cat.genotype[:2],
 			"locus_b": cat.genotype[2:4],
 			"locus_bm": cat.genotype[4:6],
@@ -57,6 +58,7 @@ class Genetics:
 			"locus_ta": cat.genotype[22:24],
 			"locus_w": cat.genotype[24:26],
 			"locus_wb": cat.genotype[26:28],
+			}
 		}
 		return genetics_dict
 	
@@ -77,3 +79,33 @@ class Genetics:
 				geno.append(a)
 			i += 1
 		return geno
+
+	def inheritance_genes(parents):
+		genes = [["Apb", "A", "a"], ["B", "b", "b1"], ["Bm", "bm"], ["C", "cb", "cm", "cs", "ca", "c"], ["D", "d"], ["E", "er", "e"], ["I", "i"], ["L", "l"], ["Mc", "mc"], ["O", "o"], ["Sp", "sp"], ["Ta", "ta"], ["W", "ws", "w"], ["Wb", "wb"]]
+		par1 = parents[0]
+		par2 = parents[1]
+		par2_genotype = []
+		geno = []
+
+		for p in parents:
+			if p:
+				Genetics.check_load_genetics(p)
+			else:
+				par2_genotype = random_genes()
+
+		print(par1.ID)
+		a = str(random.choice(par1.genotype.locus_w))
+		print(a)
+		print(par2.ID)
+		b = str(random.choice(par2_genotype[24:26] if par2_genotype else par2.genotype.locus_w))
+		print(b)
+		if genes[12].index(a) <= genes[12].index(b):
+			geno.append(a)
+			geno.append(b)
+		else:
+			geno.append(b)
+			geno.append(a)
+		print(geno)
+		return geno
+
+
