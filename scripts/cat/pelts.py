@@ -532,7 +532,7 @@ class Pelt():
         chosen_pelt = choice(
             random.choices(Pelt.pelt_categories, weights=(35, 20, 30, 15, 0), k=1)[0]
         )
-
+        """
         # Tortie chance
         # There is a default chance for female tortie, slightly increased for completely random generation.
         tortie_chance_f = game.config["cat_generation"]["base_female_tortie"] - 1
@@ -545,6 +545,14 @@ class Pelt():
         chosen_tortie_base = None
         if torbie:
             # If it is tortie, the chosen pelt above becomes the base pelt.
+            chosen_tortie_base = chosen_pelt
+            if chosen_tortie_base in ["TwoColour", "SingleColour"]:
+                chosen_tortie_base = "Single"
+            chosen_tortie_base = chosen_tortie_base.lower()
+            chosen_pelt = random.choice(Pelt.torties)
+        """
+        chosen_tortie_base = None
+        if genotype.count("O") == 1:
             chosen_tortie_base = chosen_pelt
             if chosen_tortie_base in ["TwoColour", "SingleColour"]:
                 chosen_tortie_base = "Single"
@@ -576,7 +584,6 @@ class Pelt():
             chosen_white = True
         else:
             chosen_white = False
-        #chosen_white = random.randint(1, 100) <= 40
 
         # Adjustments to pelt chosen based on if the pelt has white in it or not.
         if chosen_pelt in ["TwoColour", "SingleColour"]:
@@ -709,14 +716,11 @@ class Pelt():
 
                     # Ginger is often duplicated to increase its chances
                     if (self.colour in Pelt.black_colours) or (self.colour in Pelt.white_colours):
-                        self.tortiecolour = choice((Pelt.ginger_colours * 2) + Pelt.brown_colours)
+                        self.tortiecolour = choice(Pelt.ginger_colours)
                     elif self.colour in Pelt.ginger_colours:
                         self.tortiecolour = choice(Pelt.brown_colours + Pelt.black_colours * 2)
                     elif self.colour in Pelt.brown_colours:
-                        possible_colors = Pelt.brown_colours.copy()
-                        possible_colors.remove(self.colour)
-                        possible_colors.extend(Pelt.black_colours + (Pelt.ginger_colours * 2))
-                        self.tortiecolour = choice(possible_colors)
+                        self.tortiecolour = choice(Pelt.ginger_colours)
                     else:
                         self.tortiecolour = "GOLDEN"
 
