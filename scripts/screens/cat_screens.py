@@ -918,6 +918,22 @@ class ProfileScreen(Screens):
             else:
                 output += f"nutrition status: 100%\n"
 
+        # GENOTYPE
+        gt_text =""
+        if the_cat.genotype:
+            if type(the_cat.genotype) == list:
+                gt_text += str(the_cat.genotype)
+            else:
+                alleles = ""
+                alleles = f" {the_cat.genotype.locus_a} {the_cat.genotype.locus_b} {the_cat.genotype.locus_bm} {the_cat.genotype.locus_c} {the_cat.genotype.locus_d} {the_cat.genotype.locus_e} {the_cat.genotype.locus_i} {the_cat.genotype.locus_l} {the_cat.genotype.locus_mc} {the_cat.genotype.locus_o} {the_cat.genotype.locus_sp} {the_cat.genotype.locus_ta} {the_cat.genotype.locus_w} {the_cat.genotype.locus_wb}"
+                gt_text += alleles
+        else:
+            gt_text = 'this should not appear'
+
+        output += f"genotype: {gt_text}"
+        # NEWLINE ----------
+        output += "\n"    
+
         if the_cat.is_disabled():
             for condition in the_cat.permanent_condition:
                 if the_cat.permanent_condition[condition]['born_with'] is True and \

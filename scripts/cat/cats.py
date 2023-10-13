@@ -200,7 +200,7 @@ class Cat():
         self.skills = CatSkills(skill_dict=skill_dict)
         self.personality = Personality(trait="troublesome", lawful=0, aggress=0,
                                        stable=0, social=0)
-        self.genotype = []
+        self.genotype = None
 
         self.parent1 = parent1
         self.parent2 = parent2
@@ -300,6 +300,10 @@ class Cat():
             self.gender = choice(["female", "male"])
         self.g_tag = self.gender_tags[self.gender]
 
+        if loading_cat and not self.pelt:
+            print("loaded cat has no pelt")
+            self.pelt = Pelt.generate_new_pelt(self.gender, self.genotype, [Cat.fetch_cat(i) for i in (self.parent1, self.parent2) if i], self.age)
+
         # These things should only run when generating a new cat, rather than loading one in.
         if not loading_cat:
             # trans cat chances
@@ -331,12 +335,19 @@ class Cat():
             if not self.parent1:
                 self.genotype = Genetics.random_genes()
                 print(self.genotype)
-                print("--------------------------")
             else:
                 self.genotype = Genetics.inheritance_genes(parents=[Cat.fetch_cat(i) for i in (self.parent1, self.parent2) if i])
 
+            if game.clan is not None:
+                self.save_genetics() #save newly generated genetics
+                self.genotype = None #get rid of list genotype and load the genetics dict
+                self.load_genetics()
+
             # APPEARANCE
-            self.pelt = Pelt.generate_new_pelt(self.gender, self.genotype, [Cat.fetch_cat(i) for i in (self.parent1, self.parent2) if i], self.age)
+            if example:
+                self.pelt = Pelt()
+            else:
+                self.pelt = Pelt.generate_new_pelt(self.gender, self.genotype, [Cat.fetch_cat(i) for i in (self.parent1, self.parent2) if i], self.age)
             
             #Personality
             self.personality = Personality(kit_trait=self.is_baby())
@@ -1556,20 +1567,17 @@ class Cat():
         genetics_directory = get_save_dir() + '/' + clanname + '/genetics'
         genetics_file_path = genetics_directory + '/' + self.ID + '_genetics.json'
 
-        if self.dead:
-            if os.path.exists(genetics_file_path):
-                os.remove(genetics_file_path)
-            return
-
-        if type(self.genotype) is Genetics:
+        if os.path.exists(genetics_file_path):
             return
         else:
             genetics_dict = Genetics.make_dict(self)
 
         try:
             game.safe_save(genetics_file_path, genetics_dict)
+            print("saved genetics of #"+self.ID)
         except:
             print(f"WARNING: saving genetic data of cat #{self.ID} didn't work")
+
 
     def load_genetics(self):
         if game.switches['clan_name'] != '':
@@ -1578,13 +1586,18 @@ class Cat():
             clanname = game.switches['clan_list'][0]
 
         genetics_directory = get_save_dir() + '/' + clanname + '/genetics/'
-        genetics_cat_directory = genetics_directory + self.ID + '_genetics.json'
+        genetics_file_path = genetics_directory + self.ID + '_genetics.json'
 
-        if not os.path.exists(genetics_cat_directory):
+        if not os.path.exists(genetics_file_path):
+            print("The genetic data file of cat #"+self.ID+" doesn't exist.")
+            return
+        if self.dead:
+            if os.path.exists(genetics_file_path):
+                os.remove(genetics_file_path)
             return
 
         try:
-            with open(genetics_cat_directory, 'r') as read_file:
+            with open(genetics_file_path, 'r') as read_file:
                 genetic_data = ujson.loads(read_file.read())
                 self.genotype = Genetics(
                     locus_a=genetic_data[self.ID]["locus_a"],
@@ -1602,7 +1615,9 @@ class Cat():
                     locus_w=genetic_data[self.ID]["locus_w"],
                     locus_wb=genetic_data[self.ID]["locus_wb"],
                 )
-            print(self.genotype.locus_a)
+            print("loaded genetics of #"+self.ID)
+            print(self.genotype.locus_w)
+            print("-----------------------------------")
 
         except Exception as e:
             print(f"WARNING: There was an error reading the genetic data file of cat #{self}.\n", e)

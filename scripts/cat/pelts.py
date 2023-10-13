@@ -532,27 +532,9 @@ class Pelt():
         chosen_pelt = choice(
             random.choices(Pelt.pelt_categories, weights=(35, 20, 30, 15, 0), k=1)[0]
         )
-        """
-        # Tortie chance
-        # There is a default chance for female tortie, slightly increased for completely random generation.
-        tortie_chance_f = game.config["cat_generation"]["base_female_tortie"] - 1
-        tortie_chance_m = game.config["cat_generation"]["base_male_tortie"]
-        if gender == "female":
-            torbie = random.getrandbits(tortie_chance_f) == 1
-        else:
-            torbie = random.getrandbits(tortie_chance_m) == 1
-
+ 
         chosen_tortie_base = None
-        if torbie:
-            # If it is tortie, the chosen pelt above becomes the base pelt.
-            chosen_tortie_base = chosen_pelt
-            if chosen_tortie_base in ["TwoColour", "SingleColour"]:
-                chosen_tortie_base = "Single"
-            chosen_tortie_base = chosen_tortie_base.lower()
-            chosen_pelt = random.choice(Pelt.torties)
-        """
-        chosen_tortie_base = None
-        if genotype.count("O") == 1:
+        if genotype.locus_o.count("O") == 1:
             chosen_tortie_base = chosen_pelt
             if chosen_tortie_base in ["TwoColour", "SingleColour"]:
                 chosen_tortie_base = "Single"
@@ -562,16 +544,51 @@ class Pelt():
         # ------------------------------------------------------------------------------------------------------------#
         #   PELT COLOUR
         # ------------------------------------------------------------------------------------------------------------#
+        dilute_colour = {
+            "BLACK": "DARKGREY",
+            "DARKBROWN": "DARKGREY",
+            "CHOCOLATE": "GREY",
+            "GOLDEN-BROWN": "PALEGINGER",
+            "GINGER": "CREAM"
+        }
+        # B locus + O locus (RED)
+        if genotype.locus_o.count("O") == 2:
+            chosen_pelt_color = "GINGER"
+        elif any(element in "B" for element in genotype.locus_b):
+            if chosen_pelt in self.plain:
+                chosen_pelt_color = "BLACK"
+            else:
+                chosen_pelt_color = "DARKBROWN"
+        elif any(element in "b" for element in genotype.locus_b):
+            chosen_pelt_color = "CHOCOLATE"
+        else:
+            chosen_pelt_color = "GOLDEN-BROWN"
 
-        chosen_pelt_color = choice(
-            random.choices(Pelt.colour_categories, k=1)[0]
-        )
+        # D locus
+        if genotype.locus_d.count("d") == 2:
+            chosen_pelt_color = dilute_colour[chosen_pelt_color]
+
+        # Wb locus
+        if genotype.locus_wb.count("Wb") >= 1:
+            chosen_pelt_color = "GOLDEN"
+
+        # I locus
+        if genotype.locus_i.count("I") >= 1:
+            chosen_pelt_color = "SILVER"
+
+        print(genotype.locus_o)
+        print(genotype.locus_b)
+        print(genotype.locus_d)
+        print(genotype.locus_wb)
+        print(genotype.locus_i)
+        print(chosen_pelt_color)
+        print(chosen_pelt)
 
         # ------------------------------------------------------------------------------------------------------------#
         #   PELT LENGTH
         # ------------------------------------------------------------------------------------------------------------#
 
-        if genotype.count("l") > 1:
+        if genotype.locus_l.count("l") == 2:
             chosen_pelt_length = "long"
         else:
             chosen_pelt_length = choice(["short", "medium"])
@@ -580,7 +597,7 @@ class Pelt():
         #   PELT WHITE
         # ------------------------------------------------------------------------------------------------------------#
 
-        if any(element in ["W", "ws"] for element in genotype):
+        if any(element in ["W", "ws"] for element in genotype.locus_w):
             chosen_white = True
         else:
             chosen_white = False
@@ -845,11 +862,11 @@ class Pelt():
         else:
             self.points = None
 
-        if any(element in "W" for element in genotype):
+        if any(element in "W" for element in genotype.locus_w):
             weights = (0, 0, 0, 0, 1)
-        elif genotype.count("ws") > 1:
-            weights = (0, 0, 15, 5, 0)
-        elif genotype.count("ws") == 1:
+        elif genotype.locus_w.count("ws") > 1:
+            weights = (0, 0, 15, 6, 0)
+        elif genotype.locus_w.count("ws") == 1:
             weights = (15, 10, 0, 0, 0)
         else:
             weights = (10, 10, 10, 10, 1)

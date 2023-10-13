@@ -62,6 +62,7 @@ class Genetics:
 		}
 		return genetics_dict
 	
+	@staticmethod
 	def random_genes():
 		genes = [["Apb", "A", "a"], ["B", "b", "b1"], ["Bm", "bm"], ["C", "cb", "cm", "cs", "ca", "c"], ["D", "d"], ["E", "er", "e"], ["I", "i"], ["L", "l"], ["Mc", "mc"], ["O", "o"], ["Sp", "sp"], ["Ta", "ta"], ["W", "ws", "w"], ["Wb", "wb"]]
 		genew = [[1, 10, 10], [5, 2, 1], [1, 15], [30, 10, 5, 10, 2, 1], [5, 1], [15, 2, 1], [1, 30], [20, 1], [2, 1], [1, 5], [1, 10], [1, 20], [1, 10, 30], [1, 30]]
@@ -81,7 +82,8 @@ class Genetics:
 		return geno
 
 	def inheritance_genes(parents):
-		genes = [["Apb", "A", "a"], ["B", "b", "b1"], ["Bm", "bm"], ["C", "cb", "cm", "cs", "ca", "c"], ["D", "d"], ["E", "er", "e"], ["I", "i"], ["L", "l"], ["Mc", "mc"], ["O", "o"], ["Sp", "sp"], ["Ta", "ta"], ["W", "ws", "w"], ["Wb", "wb"]]
+		pass
+		'''genes = [["Apb", "A", "a"], ["B", "b", "b1"], ["Bm", "bm"], ["C", "cb", "cm", "cs", "ca", "c"], ["D", "d"], ["E", "er", "e"], ["I", "i"], ["L", "l"], ["Mc", "mc"], ["O", "o"], ["Sp", "sp"], ["Ta", "ta"], ["W", "ws", "w"], ["Wb", "wb"]]
 		par1 = parents[0]
 		par2 = parents[1]
 		par2_genotype = []
@@ -106,6 +108,6 @@ class Genetics:
 			geno.append(b)
 			geno.append(a)
 		print(geno)
-		return geno
+		return geno'''
 
 
